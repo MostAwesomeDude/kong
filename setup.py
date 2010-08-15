@@ -10,4 +10,5 @@ setup(
     author_email="MostAwesomeDude@gmail.com",
     url="http://github.com/MostAwesomeDude/kong",
     py_modules=["kong"],
+    scripts=["scripts/kongregate"],
 )
