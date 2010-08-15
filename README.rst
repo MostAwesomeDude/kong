@@ -16,4 +16,5 @@ github.
 
 === License ===
 
-Kong is currently unlicensed, but this will be fixed shortly.
+Kong and all other files in this package are available under the terms of the
+MIT X11 license, reproduced in COPYING and also in the library.
