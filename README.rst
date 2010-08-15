@@ -7,7 +7,7 @@ its inception.
 
 === Usage ===
 
-To be decided. Library and executable usage still need to be split out.
+To be decided.
 
 === Bugs ===
 

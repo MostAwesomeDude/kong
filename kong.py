@@ -26,7 +26,6 @@ from __future__ import division
 import collections
 import datetime
 import json
-import sys
 import urllib2
 
 def acquire_json(name, d={}):
@@ -131,17 +130,3 @@ class BadgeDict(dict):
             raise AttributeError, "Unknown type %s" % type
 
         return getattr(self, name)
-
-
-if len(sys.argv) < 3:
-    print "Usage: %s <action> <account>" % sys.argv[0]
-    sys.exit(1)
-
-action = sys.argv[1]
-account = sys.argv[2]
-
-if action == "stats":
-    stats(account)
-else:
-    print "Unknown command %s" % action
-    sys.exit(1)
