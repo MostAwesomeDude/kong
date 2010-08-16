@@ -61,11 +61,9 @@ class BadgeDict(dict):
 
 def acquire_json(name, d={}):
     if name not in d:
-        print "Acquiring %s..." % name,
         handle = urllib2.urlopen("http://www.kongregate.com/%s.json" % name)
         data = handle.read()
         d[name] = json.loads(data)
-        print "OK!"
     return d[name]
 
 class Kongregate(object):
