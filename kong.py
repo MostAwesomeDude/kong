@@ -59,11 +59,18 @@ class BadgeDict(dict):
 
         return getattr(self, name)
 
+class KongException(Exception):
+    pass
+
 def acquire_json(name, d={}):
     if name not in d:
-        handle = urllib2.urlopen("http://www.kongregate.com/%s.json" % name)
-        data = handle.read()
-        d[name] = json.loads(data)
+        try:
+            handle = urllib2.urlopen("http://www.kongregate.com/%s.json" %
+                name)
+            data = handle.read()
+            d[name] = json.loads(data)
+        except urllib2.HTTPError:
+            raise KongException("Couldn't obtain JSON '%s'" % name)
     return d[name]
 
 class Kongregate(object):
