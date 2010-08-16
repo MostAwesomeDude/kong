@@ -28,6 +28,37 @@ import datetime
 import json
 import urllib2
 
+class BadgeDict(dict):
+    def __init__(self, iterable=[]):
+        super(BadgeDict, self).__init__()
+
+        for entry in iterable:
+            self[entry["id"]] = entry
+
+    def __getattr__(self, name):
+        type, chaff, target = name.partition("_by_")
+        if not target:
+            raise AttributeError, "No target provided"
+
+        if type == "count":
+            def f(self):
+                d = collections.defaultdict(int)
+                for entry in self.itervalues():
+                    d[entry[target]] += 1
+                return d
+
+            setattr(self.__class__, name, f)
+        elif type == "iter":
+            def f(self, filter):
+                for entry in self.itervalues():
+                    if entry[target] == filter:
+                        yield entry
+            setattr(self.__class__, name, f)
+        else:
+            raise AttributeError, "Unknown type %s" % type
+
+        return getattr(self, name)
+
 def acquire_json(name, d={}):
     if name not in d:
         print "Acquiring %s..." % name,
@@ -99,34 +130,3 @@ def stats(account_name):
         (today + datetime.timedelta(days_remaining)).strftime("%B %d, %Y")
 
     print "-- end of stats --"
-
-class BadgeDict(dict):
-    def __init__(self, iterable=[]):
-        super(BadgeDict, self).__init__()
-
-        for entry in iterable:
-            self[entry["id"]] = entry
-
-    def __getattr__(self, name):
-        type, chaff, target = name.partition("_by_")
-        if not target:
-            raise AttributeError, "No target provided"
-
-        if type == "count":
-            def f(self):
-                d = collections.defaultdict(int)
-                for entry in self.itervalues():
-                    d[entry[target]] += 1
-                return d
-
-            setattr(self.__class__, name, f)
-        elif type == "iter":
-            def f(self, filter):
-                for entry in self.itervalues():
-                    if entry[target] == filter:
-                        yield entry
-            setattr(self.__class__, name, f)
-        else:
-            raise AttributeError, "Unknown type %s" % type
-
-        return getattr(self, name)
