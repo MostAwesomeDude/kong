@@ -125,18 +125,13 @@ def stats(account_name):
     print "-- copy below this line --"
     print today.strftime("%B %d, %Y")
 
-    user_count = len(user.badges)
-    total_count = len(kong.badges)
+    print_percentage("Acquired Badges", len(user.badges), len(kong.badges))
 
-    print_percentage("Acquired Badges", user_count, total_count)
-
+    difficulty_counts = kong.badges.count_by_difficulty()
+    user_difficulty_counts = user.badges.count_by_difficulty()
     for difficulty in ("easy", "medium", "hard", "impossible"):
-        difficulty_count = kong.badges.count_by_difficulty()[difficulty]
-        user_difficulty_count = sum(1 for chaff in
-            user.badges.iter_by_difficulty(difficulty))
-
         print_percentage("%ss" % difficulty.capitalize(),
-            user_difficulty_count, difficulty_count)
+            user_difficulty_counts[difficulty], difficulty_counts[difficulty])
 
     total_points_from_badges = sum(badge["points"] for badge in
         user.badges.itervalues())
@@ -145,13 +140,13 @@ def stats(account_name):
         account_json["points"])
 
     print "- Average Points per Badge: %.2f" % \
-        (total_points_from_badges / user_count)
+        (total_points_from_badges / len(user.badges))
 
-    badges_per_day = user_count / day_delta.days
+    badges_per_day = len(user.badges) / day_delta.days
 
     print "- Average Badges per Day: %.2f" % badges_per_day
 
-    days_remaining = (total_count - user_count) / badges_per_day
+    days_remaining = (len(kong.badges) - len(user.badges)) / badges_per_day
 
     print "- Estimated date of completion: %s" % \
         (today + datetime.timedelta(days_remaining)).strftime("%B %d, %Y")
