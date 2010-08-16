@@ -11,7 +11,7 @@ f.close()
 
 setup(
     name="kong",
-    version="0.2",
+    version="0.2.1",
     description="Kongregate-related utilities",
     long_description=long_description,
     author="Corbin Simpson",

@@ -2,6 +2,11 @@
 Changelog
 =========
 
+0.2.1
+-----
+
+ * Add changelog to distribution.
+
 0.2
 ---
 
