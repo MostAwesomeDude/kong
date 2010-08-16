@@ -104,7 +104,7 @@ def print_percentage(label, current, total):
     Pretty-print a percentage in a uniform manner.
     """
 
-    print "- %s: %d of %d (%2.2f%%)" % (label, current, total,
+    return "- %s: %d of %d (%2.2f%%)" % (label, current, total,
         (current * 100) / total)
 
 def stats(account_name):
@@ -115,6 +115,8 @@ def stats(account_name):
     kong = Kongregate()
     user = User(kong, account_name)
 
+    retval = []
+
     account_json = acquire_json("accounts/%s" % account_name)
 
     start_date = account_json["created_at"]
@@ -122,33 +124,37 @@ def stats(account_name):
     today = datetime.date.today()
     day_delta = today - then.date()
 
-    print "-- copy below this line --"
-    print today.strftime("%B %d, %Y")
+    retval.append("-- copy below this line --")
+    retval.append(today.strftime("%B %d, %Y"))
 
-    print_percentage("Acquired Badges", len(user.badges), len(kong.badges))
+    retval.append(print_percentage("Acquired Badges", len(user.badges),
+            len(kong.badges)))
 
     difficulty_counts = kong.badges.count_by_difficulty()
     user_difficulty_counts = user.badges.count_by_difficulty()
     for difficulty in ("easy", "medium", "hard", "impossible"):
-        print_percentage("%ss" % difficulty.capitalize(),
-            user_difficulty_counts[difficulty], difficulty_counts[difficulty])
+        retval.append(print_percentage("%ss" % difficulty.capitalize(),
+                user_difficulty_counts[difficulty],
+                difficulty_counts[difficulty]))
 
     total_points_from_badges = sum(badge["points"] for badge in
         user.badges.itervalues())
 
-    print_percentage("Points from Badges", total_points_from_badges,
-        account_json["points"])
+    retval.append(print_percentage("Points from Badges",
+            total_points_from_badges, account_json["points"]))
 
-    print "- Average Points per Badge: %.2f" % \
-        (total_points_from_badges / len(user.badges))
+    retval.append("- Average Points per Badge: %.2f" %
+        (total_points_from_badges / len(user.badges)))
 
     badges_per_day = len(user.badges) / day_delta.days
 
-    print "- Average Badges per Day: %.2f" % badges_per_day
+    retval.append("- Average Badges per Day: %.2f" % badges_per_day)
 
     days_remaining = (len(kong.badges) - len(user.badges)) / badges_per_day
 
-    print "- Estimated date of completion: %s" % \
-        (today + datetime.timedelta(days_remaining)).strftime("%B %d, %Y")
+    retval.append("- Estimated date of completion: %s" %
+        (today + datetime.timedelta(days_remaining)).strftime("%B %d, %Y"))
 
-    print "-- end of stats --"
+    retval.append("-- end of stats --")
+
+    return retval

@@ -33,7 +33,8 @@ action = sys.argv[1]
 
 if action == "stats":
     account = sys.argv[2]
-    kong.stats(account)
+    for line in kong.stats(account):
+        print line
 else:
     print "Unknown command %s" % action
     sys.exit(1)
