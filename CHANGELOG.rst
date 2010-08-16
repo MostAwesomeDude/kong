@@ -2,13 +2,13 @@
 Changelog
 =========
 
-Git
+0.2
 ---
 
  * Fixed README.
  * Added changelog.
  * Removed print statements from library.
- * Created real API objects.
+ * Created real API objects: Kongregate, User, KongException.
  * Cleaned up code, improved run times.
 
 0.1

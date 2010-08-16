@@ -10,7 +10,9 @@ its inception.
 Usage
 -----
 
-To be decided.
+>>> import kong
+>>> api = kong.Kongregate()
+>>> user = kong.User(api, "MostAwesomeDude")
 
 Bugs
 ----
