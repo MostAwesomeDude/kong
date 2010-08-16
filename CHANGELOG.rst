@@ -7,6 +7,9 @@ Git
 
  * Fixed README.
  * Added changelog.
+ * Removed print statements from library.
+ * Created real API objects.
+ * Cleaned up code, improved run times.
 
 0.1
 ---
