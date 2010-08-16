@@ -68,6 +68,37 @@ def acquire_json(name, d={}):
         print "OK!"
     return d[name]
 
+class Kongregate(object):
+    def __init__(self):
+        """
+        Create an instance of the Kongregate API.
+
+        Automatically retrieves information as needed from Kongregate.
+        """
+
+        badge_json = acquire_json("badges")
+        self.badges = BadgeDict(badge_json)
+
+class User(object):
+    def __init__(self, kong, username):
+        """
+        Create an instance representing a Kongregate user.
+
+        :Parameters:
+            kong : `Kongregate`
+                A Kongregate API handle.
+            username : str
+                The account username. Case-insensitive.
+        """
+
+        account_badges_json = acquire_json("accounts/%s/badges" % username)
+        badge_keys = set(i["badge_id"] for i in account_badges_json)
+        self.badges = BadgeDict()
+        # Populate our BadgeDict with only the badges we've earned
+        self.badges.update((key, value)
+            for key, value in kong.badges.iteritems()
+            if key in badge_keys)
+
 def print_percentage(label, current, total):
     """
     Pretty-print a percentage in a uniform manner.
@@ -81,12 +112,10 @@ def stats(account_name):
     Print badge statistics.
     """
 
-    badge_json = acquire_json("badges")
-    account_json = acquire_json("accounts/%s" % account_name)
-    account_badges_json = acquire_json("accounts/%s/badges" % account_name)
+    kong = Kongregate()
+    user = User(kong, account_name)
 
-    total_badges = BadgeDict(badge_json)
-    user_badges = set(i["badge_id"] for i in account_badges_json)
+    account_json = acquire_json("accounts/%s" % account_name)
 
     start_date = account_json["created_at"]
     then = datetime.datetime.strptime(start_date, "%Y-%m-%d %H:%M:%S")
@@ -96,23 +125,21 @@ def stats(account_name):
     print "-- copy below this line --"
     print today.strftime("%B %d, %Y")
 
-    user_count = len(user_badges)
-    total_count = len(total_badges)
+    user_count = len(user.badges)
+    total_count = len(kong.badges)
 
     print_percentage("Acquired Badges", user_count, total_count)
 
     for difficulty in ("easy", "medium", "hard", "impossible"):
-        difficulty_count = total_badges.count_by_difficulty()[difficulty]
+        difficulty_count = kong.badges.count_by_difficulty()[difficulty]
         user_difficulty_count = sum(1 for chaff in
-            total_badges.iter_by_difficulty(difficulty)
-            if chaff["id"] in user_badges)
+            user.badges.iter_by_difficulty(difficulty))
 
         print_percentage("%ss" % difficulty.capitalize(),
             user_difficulty_count, difficulty_count)
 
     total_points_from_badges = sum(badge["points"] for badge in
-        total_badges.itervalues()
-        if badge["id"] in user_badges)
+        user.badges.itervalues())
 
     print_percentage("Points from Badges", total_points_from_badges,
         account_json["points"])
